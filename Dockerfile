@@ -7,4 +7,5 @@ RUN npm install
 COPY . .
 
 EXPOSE 3000
-CMD node server.js
+CMD ["sh", "-c", "node server.js 2>/dev/null"]
+

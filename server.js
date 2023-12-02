@@ -18,6 +18,7 @@ let last = {
     prot: 'http',
 };
 app.use('/', (req, res) => {
+    if ('dash' in req.query) return res.sendFile("dashboard.html", { root: __dirname });
     console.log(`>>> ${req.ip} ${req.method} ${req.url}`);
 
     const referer = new URL(req.headers.referer || 'http://localhost:80');
