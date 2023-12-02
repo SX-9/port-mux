@@ -3,8 +3,12 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const app = express();
 const whitelist_port = process.env.WHITELIST_PORT?.split(',') || [];
 const whitelist_host = process.env.WHITELIST_HOST?.split(',') || [];
-const port = 3000;
+const port = process.env.PORT || 3000;
 const defaultHost = process.env.DEFAULT_HOST || 'localhost';
+
+console.log(`+++ Whitelisted Ports ${whitelist_port}`);
+console.log(`+++ Whitelisted Hosts ${whitelist_host}`);
+console.log(`+++ Default Host ${defaultHost}`);
 
 app.setMaxListeners(Infinity);
 app.set('trust proxy', true);
@@ -14,7 +18,7 @@ let last = {
     prot: 'http',
 };
 app.use('/', (req, res) => {
-    console.log(`> Input ${req.ip} ${req.method} ${req.url}`);
+    console.log(`>>> ${req.ip} ${req.method} ${req.url}`);
 
     const referer = new URL(req.headers.referer || 'http://localhost:80');
     const refererParams = new URLSearchParams(referer.search);
@@ -26,12 +30,12 @@ app.use('/', (req, res) => {
 
     debugger
     if (whitelist_port.length > 0 && !whitelist_port.includes(port.toString())) {
-        console.log("> Forbidden", port);
+        console.log("XXX Forbidden Port", port);
         res.status(403).send('Forbidden');
         return;
     }
     if (whitelist_host.length > 0 && !whitelist_host.includes(host)) {
-        console.log("> Forbidden", host);
+        console.log("XXX Forbidden Host", host);
         res.status(403).send('Forbidden');
         return;
     }
@@ -43,9 +47,9 @@ app.use('/', (req, res) => {
         ws: true,
     });
     proxy(req, res);
-    console.log("> Output", target);
+    console.log("<<< ", target);
 });
 
 app.listen(port, () => {
-    console.log(`OK ${port}`);
+    console.log(`=== Started On Port ${port}`);
 });
